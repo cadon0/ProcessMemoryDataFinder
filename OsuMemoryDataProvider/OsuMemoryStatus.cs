@@ -9,7 +9,7 @@
         GameShutdownAnimation = 3,
         SongSelectEdit = 4,
         SongSelect = 5,
-        WIP_NoIdeaWhatThisIs =6, 
+        WIP_NoIdeaWhatThisIs = 6, 
         ResultsScreen = 7,
         GameStartupAnimation = 10,
         MultiplayerRooms = 11,
