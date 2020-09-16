@@ -153,7 +153,7 @@ namespace OsuMemoryDataProvider
         /// </summary>
         /// <param name="statusNumber">Use this number whenever <see cref="OsuMemoryStatus.Unknown"/> is returned</param>
         /// <returns></returns>
-        public OsuMemoryStatus GetCurrentStatus(out int statusNumber)
+        public OsuMemoryStatus GetCurrentStatus()
         {
             int num;
             lock (_lockingObject)
@@ -161,7 +161,6 @@ namespace OsuMemoryDataProvider
                 num = GetInt((int)SignatureNames.OsuStatus);
             }
 
-            statusNumber = num;
             if (Enum.IsDefined(typeof(OsuMemoryStatus), num))
             {
                 return (OsuMemoryStatus)num;

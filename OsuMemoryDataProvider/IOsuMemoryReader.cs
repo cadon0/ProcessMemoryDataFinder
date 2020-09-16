@@ -9,6 +9,6 @@
         string GetMapFolderName();
         int ReadPlayTime();
 
-        OsuMemoryStatus GetCurrentStatus(out int statusNumber);
+        OsuMemoryStatus GetCurrentStatus();
     }
 }

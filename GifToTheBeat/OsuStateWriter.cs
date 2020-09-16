@@ -1,21 +1,32 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using OsuMemoryDataProvider;
+using WebSocketSharp.Server;
 
 namespace GifToTheBeat
 {
-    public partial class OsuStateManager
+    /// <summary>
+    /// Writes osu! state to a Web Socket
+    /// </summary>
+    public partial class OsuStateWriter
     {
-        private int _readDelay = 500;
+        private readonly string _webSocketAddress = "127.0.0.1";
+        private WebSocketServer _webSocketServer;
+        private DataContainer _dataContainer = new DataContainer();
+
+        private readonly int _readDelay = 500;
         private readonly IOsuMemoryReader _reader;
-        private CancellationTokenSource cts = new CancellationTokenSource();
-        public OsuStateManager()
+
+        public OsuStateWriter(int socketPort)
         {
             _reader = OsuMemoryReader.Instance.GetInstanceForWindowTitleHint("osu!");
+            _webSocketServer = new WebSocketServer(IPAddress.Parse(_webSocketAddress), socketPort);
+            _webSocketServer.AddWebSocketService("/GifToTheBeatOsuDataFeed", () => new DataSender(_dataContainer));
+            _webSocketServer.Start();
         }
 
         public void GetState()
@@ -24,31 +35,16 @@ namespace GifToTheBeat
             {
                 try
                 {
-                    var dir = "";
                     while (true)
                     {
-                        if (dir == "")
-                        {
-                            var _processes = Process.GetProcessesByName("osu!");
-                            if (_processes.Length > 0)
-                            {
-                                var osuExePath = _processes[0].Modules[0].FileName;
-                                dir = osuExePath.Remove(osuExePath.LastIndexOf('\\'));
-                            }
-                        }
-
-                        if (cts.IsCancellationRequested)
-                            return;
-
                         var mapFolderName = string.Empty;
                         var osuFileName = string.Empty;
                         var status = OsuMemoryStatus.Unknown;
-                        var statusNum = -1;
                         var playTime = -1;
 
                         mapFolderName = _reader.GetMapFolderName();
                         osuFileName = _reader.GetOsuFileName();
-                        status = _reader.GetCurrentStatus(out statusNum);
+                        status = _reader.GetCurrentStatus();
                         playTime = _reader.ReadPlayTime();
                         var isoTime = DateTimeOffset.Now.ToString("o");
 
@@ -68,15 +64,15 @@ namespace GifToTheBeat
                         }
 
                         var sep = Path.DirectorySeparatorChar;
-                        var output = JsonConvert.SerializeObject(new
+                        _dataContainer.Data = JsonConvert.SerializeObject(new
                         {
                             status = $"{status}",
                             mapTime = playTime,
                             isoTime,
                             bpmMultiplier,
-                            osuFile =  $"{dir}{sep}Songs{sep}{mapFolderName}{sep}{osuFileName}"
+                            // Relative to song directory
+                            relativeOsuFilePath = osuFileName != null ? $"{sep}{mapFolderName}{sep}{osuFileName}" : null
                         });
-                        Console.WriteLine(output);
 
                         await Task.Delay(_readDelay);
                     }
@@ -85,6 +81,35 @@ namespace GifToTheBeat
                 {
                 }
             });
+        }
+
+        internal class DataContainer
+        {
+            public volatile string Data;
+        }
+
+        internal class DataSender : WebSocketBehavior
+        {
+            protected readonly DataContainer DataContainer;
+            public DataSender(DataContainer dataContainer)
+            {
+                DataContainer = dataContainer;
+                Task.Run(SendLoop);
+            }
+
+            public async Task SendLoop()
+            {
+                string lastSentData = string.Empty;
+                while (true)
+                {
+                    if (lastSentData != DataContainer.Data)
+                    {
+                        lastSentData = DataContainer.Data;
+                        await Send(lastSentData);
+                    }
+                    await Task.Delay(500);
+                }
+            }
         }
     }
 }
