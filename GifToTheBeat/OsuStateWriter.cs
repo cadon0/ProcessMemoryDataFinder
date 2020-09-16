@@ -71,7 +71,7 @@ namespace GifToTheBeat
                             isoTime,
                             bpmMultiplier,
                             // Relative to song directory
-                            relativeOsuFilePath = osuFileName != null ? $"{mapFolderName}{sep}{osuFileName}" : null
+                            relativeOsuFilePath = !string.IsNullOrEmpty(osuFileName) ? $"{mapFolderName}{sep}{osuFileName}" : null
                         });
 
                         await Task.Delay(_readDelay);
