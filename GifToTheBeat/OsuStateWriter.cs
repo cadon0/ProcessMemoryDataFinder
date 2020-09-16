@@ -18,7 +18,7 @@ namespace GifToTheBeat
         private WebSocketServer _webSocketServer;
         private DataContainer _dataContainer = new DataContainer();
 
-        private readonly int _readDelay = 500;
+        private readonly int _readDelay = 100;
         private readonly IOsuMemoryReader _reader;
 
         public OsuStateWriter(int socketPort)
@@ -71,7 +71,7 @@ namespace GifToTheBeat
                             isoTime,
                             bpmMultiplier,
                             // Relative to song directory
-                            relativeOsuFilePath = osuFileName != null ? $"{sep}{mapFolderName}{sep}{osuFileName}" : null
+                            relativeOsuFilePath = osuFileName != null ? $"{mapFolderName}{sep}{osuFileName}" : null
                         });
 
                         await Task.Delay(_readDelay);
@@ -107,7 +107,7 @@ namespace GifToTheBeat
                         lastSentData = DataContainer.Data;
                         await Send(lastSentData);
                     }
-                    await Task.Delay(500);
+                    await Task.Delay(250);
                 }
             }
         }
