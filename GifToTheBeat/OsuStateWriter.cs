@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using OsuMemoryDataProvider;
+using WebSocketSharp;
 using WebSocketSharp.Server;
 
 namespace GifToTheBeat
@@ -25,6 +26,8 @@ namespace GifToTheBeat
         {
             _reader = OsuMemoryReader.Instance.GetInstanceForWindowTitleHint("osu!");
             _webSocketServer = new WebSocketServer(IPAddress.Parse(_webSocketAddress), socketPort);
+            _webSocketServer.ReuseAddress = true;
+            _webSocketServer.WaitTime = TimeSpan.FromSeconds(30);
             _webSocketServer.AddWebSocketService("/GifToTheBeatOsuDataFeed", () => new DataSender(_dataContainer));
             _webSocketServer.Start();
         }
@@ -106,6 +109,10 @@ namespace GifToTheBeat
                     {
                         lastSentData = DataContainer.Data;
                         await Send(lastSentData);
+                    }
+                    if (State == WebSocketState.Closed)
+                    {
+                        return;
                     }
                     await Task.Delay(250);
                 }
