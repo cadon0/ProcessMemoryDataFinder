@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace GifToTheBeat
+﻿namespace GifToTheBeatDataProvider
 {
     class Program
     {

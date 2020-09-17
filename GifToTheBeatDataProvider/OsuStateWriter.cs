@@ -8,7 +8,7 @@ using OsuMemoryDataProvider;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 
-namespace GifToTheBeat
+namespace GifToTheBeatDataProvider
 {
     /// <summary>
     /// Writes osu! state to a Web Socket

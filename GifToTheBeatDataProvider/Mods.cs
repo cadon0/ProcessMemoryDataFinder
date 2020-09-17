@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GifToTheBeat
+namespace GifToTheBeatDataProvider
 {
     [Flags]
     public enum Mods
