@@ -1,15 +1,21 @@
-# ProcessMemoryDataFinder <a href="https://www.nuget.org/packages/ProcessMemoryDataFinder"><img src="https://img.shields.io/nuget/v/ProcessMemoryDataFinder?label=ProcessMemoryDataFinder" alt="nuget"></a> | <a href="https://www.nuget.org/packages/OsuMemoryDataProvider"><img src="https://img.shields.io/nuget/v/OsuMemoryDataProvider?label=OsuMemoryDataProvider" alt="nuget"></a>
+# GifToTheBeatDataProvider
 
-Provides means to find data based on pre-made memory signatures and read that data in windows processes.
+For use with [gif-to-the-beat](https://github.com/cadon0/gif-to-the-beat)
 
-It was mainly created to be able to read various values from the game called [osu!](https://osu.ppy.sh) but it was written in a way that should allow use for any windows program.
+[Download releases here](https://github.com/cadon0/ProcessMemoryDataFinder/releases)
 
-# Structure:
- * ProcessMemoryDataFinder - main implementation, does not have any application-specifc code.
- * OsuMemoryDataProvider / OsuMemoryDataProviderTester - example usage for the previously mentioned osu! game
- 
-It should be noted that ProcessMemoryDataFinder targets x86 platform. Make sure that immediate works also target that platform in order for everything to work correctly.
+Reads the memory of the game [osu!](https://osu.ppy.sh/) as it runs. This will not work with [osu!lazer](https://github.com/ppy/osu)
 
+The following information will be published (as JSON) to a websocket on `127.0.0.1:7270/GifToTheBeatOsuDataFeed`:
+
+- status
+- mapTime
+- isoTime
+- bpmMultiplier
+- relativeOsuFilePath
+
+The first argument to the program can be used to change port number
 
 ## License
+
 This software is licensed under GNU GPLv3. You can find the full text of the license [here](https://github.com/Piotrekol/ProcessMemoryDataFinder/blob/master/LICENSE).
